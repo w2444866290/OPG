@@ -5,12 +5,12 @@ import java.util.Stack;
 public class opg {
     public static int[][] opMatrix = {
             //+  *  (  )  i  #
-            { 2, 1, 1, 2, 1, 2 }, // +
-            { 2, 2, 1, 2, 1, 2 }, // *
-            { 1, 1, 1, 3, 1, -1 }, // (
+            { 2, 1, 1, 2, 1, 2 },   // +
+            { 2, 2, 1, 2, 1, 2 },   // *
+            { 1, 1, 1, 3, 1, -1 },  // (
             { 2, 2, -1, 2, -1, 2 }, // )
             { 2, 2, -1, 2, -1, 2 }, // i
-            { 1, 1, 1, -1, 1, 0 }  // #
+            { 1, 1, 1, -1, 1, 0 }   // #
     };
 
     public static void main(String[] args) {
@@ -44,18 +44,19 @@ public class opg {
                 }
                 // greater, cut
                 else if (priority == 2){
-                    // i->R, push R to charactersStack
+                    // i->R
                     if (peek == 'i') {
                         operatorStack.pop();
                         charactersStack.push('R');
                     }
-                    // R+R|R*R->R, pop*2 & push*1 = pop
-                    if (peek == '+' || peek == '*') {
+                    // R+R|R*R->R
+                    else if (peek == '+' || peek == '*') {
                         operatorStack.pop();
                         charactersStack.pop();
                     }
-                    // (R)->R, pop R & push R = 0
-                    if (peek == '(') {
+                    // (R)->R
+                    else if (peek == ')') {
+                        operatorStack.pop();
                         operatorStack.pop();
                     }
                     if (charactersStack.size() == 0 || operatorStack.size() == 0) {
