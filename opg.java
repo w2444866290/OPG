@@ -12,6 +12,8 @@ public class opg {
             { 2, 2, -1, 2, -1, 2 }, // i
             { 1, 1, 1, -1, 1, 0 }   // #
     };
+    public static Stack<Character> charactersStack = new Stack<Character>();
+    public static Stack<Character> operatorStack = new Stack<Character>();
 
     public static void main(String[] args) {
         StringBuilder opString = new StringBuilder();
@@ -19,14 +21,11 @@ public class opg {
             BufferedReader input = new BufferedReader(new FileReader(args[0]));
             String getInput = input.readLine();
             opString.append(getInput);
-            opString.append('#');
-
         } catch (Exception e) {
             e.getStackTrace();
         }
 
-        Stack<Character> charactersStack = new Stack<Character>();
-        Stack<Character> operatorStack = new Stack<Character>();
+        opString.append('#');
         operatorStack.push('#');
 
         int i = 0;
@@ -44,21 +43,33 @@ public class opg {
                 }
                 // greater, cut
                 else if (priority == 2){
-                    // i->R
+                    // operator needs no entry
+                    // i->R    
                     if (peek == 'i') {
                         operatorStack.pop();
                         charactersStack.push('R');
                     }
-                    // R+R|R*R->R
-                    else if (peek == '+' || peek == '*') {
-                        operatorStack.pop();
-                        charactersStack.pop();
+
+                    // + * ) need entries
+                    // first check out if they have enough entries
+                    if (enoughEntries()) {
+                        // R+R|R*R->R
+                        if (peek == '+' || peek == '*') {
+                            operatorStack.pop();
+                            charactersStack.pop();
+                        }
+                        // (R)->R
+                        else if (peek == ')') {
+                            operatorStack.pop();
+                            operatorStack.pop();
+                        }
                     }
-                    // (R)->R
-                    else if (peek == ')') {
-                        operatorStack.pop();
-                        operatorStack.pop();
+                    else {
+                        System.out.println("RE");
+                        return;
                     }
+
+                    // whether there still have operators in our stack while cutting
                     if (charactersStack.size() == 0 || operatorStack.size() == 0) {
                         System.out.println("RE");
                         return;
@@ -75,7 +86,9 @@ public class opg {
                 }
                 // termination
                 else break;
-            } else {
+            }
+            // not an operator
+            else {
                 System.out.println("E");
                 return;
             }
@@ -109,5 +122,35 @@ public class opg {
             default:
                 return -1;
         }
+    }
+
+    // whether operators have enough entries
+    public static boolean enoughEntries() {
+        int n = charactersStack.size();
+        boolean isChange = false;
+
+        for (char op : operatorStack) {
+            // binary operator
+            if (op == '+' || op == '*') {
+                n -= 2;
+                isChange = true;
+            }
+            // unary operator
+            else if (op == ')') {
+                n -= 1;
+                isChange = true;
+            }
+
+            if (isChange) {
+                if (n < 0)
+                    return false;
+                else {
+                    n++;
+                    isChange = false;
+                }
+            }
+        }
+
+        return true;
     }
 }
